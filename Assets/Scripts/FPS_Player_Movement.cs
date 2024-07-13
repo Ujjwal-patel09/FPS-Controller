@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class FPS_Player_Movement : MonoBehaviour
 {
-   public Player_Animation player_Animation;
    private CharacterController characterController;
     
    [Header("Movement")]
-   public float MoveSpeed = 10f;
+   public float MoveSpeed  = 2f;
+   public Vector3 MoveDirection;
    private Vector3 velocity;
     
    [Header("Ground Check")]
@@ -34,26 +34,19 @@ public class FPS_Player_Movement : MonoBehaviour
       Jump();
    }
 
-   void movement()
+   public void movement()
    {
       float x = Input.GetAxis("Horizontal");
       float z = Input.GetAxis("Vertical");
         
       // for move in direction of  camera facing//
-      Vector3 MoveDirection = transform.right * x + transform.forward * z;
+      MoveDirection = transform.right * x + transform.forward * z;
       characterController.Move(MoveDirection * MoveSpeed * Time.deltaTime);
 
       // for fall in ground using gravity and velocity //
       velocity.y += gravity * Time.deltaTime;
       characterController.Move(velocity * Time.deltaTime);
 
-      //for animation//
-      if(MoveDirection.magnitude > 0.1f)
-      {
-         player_Animation.iswalking = true;    
-      }else{
-         player_Animation.iswalking = false;
-      }
    }
 
    void Ground_Check()
