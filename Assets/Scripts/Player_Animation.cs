@@ -13,7 +13,7 @@ public class Player_Animation : MonoBehaviour
         transform.localPosition = new Vector3(0,0,0);
 
         // for walking animation //
-        if(fPS_Player_Movement.MoveDirection.magnitude > 0.1f)
+        if(fPS_Player_Movement.Walking)
         {
             playerAnimator.SetBool("isWalking",true);
         }else
@@ -22,14 +22,12 @@ public class Player_Animation : MonoBehaviour
         }
 
         // for running animation //
-        if(fPS_Player_Movement.MoveDirection.magnitude > 0.1f && Input.GetKey(KeyCode.LeftShift))
+        if(fPS_Player_Movement.Running)
         {
-            playerAnimator.SetBool("isRunning",true);
-            fPS_Player_Movement.MoveSpeed = 6f;
+            playerAnimator.SetBool("isRunning",true);    
         }else
         {
             playerAnimator.SetBool("isRunning",false);
-            fPS_Player_Movement.MoveSpeed = 2f;
         }
 
         
