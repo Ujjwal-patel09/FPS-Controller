@@ -6,15 +6,14 @@ public class FPS_Player_Movement : MonoBehaviour
 {
     
    [Header("Walking & Running")]
-   private CharacterController characterController;
-   private Vector3 MoveDirection;
-   private Vector3 velocity;
-   private float MoveSpeed;
-   
    public float walking_speed;
    public float running_speed;
    public bool Walking;
    public bool Running;
+   private CharacterController characterController;
+   private Vector3 MoveDirection;
+   private Vector3 velocity;
+   private float MoveSpeed; 
     
    [Header("Jump & Ground_Check")]
    public float gravity = -10f;
@@ -82,9 +81,13 @@ public class FPS_Player_Movement : MonoBehaviour
       // for Jump //
       if(Input.GetButtonDown("Jump") && isGrounded)
       {
-         velocity.y = Mathf.Sqrt(JumpHight * -2f * gravity);
+         StartCoroutine(jumping());
+      }
+      IEnumerator jumping()
+      {
          Jump = true;
-      }else{
+         velocity.y = Mathf.Sqrt(JumpHight * -2f * gravity);
+         yield return new WaitForSeconds(0.7f);
          Jump = false;
       }
    }
