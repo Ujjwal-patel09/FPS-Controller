@@ -1,11 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class Player_Animation : MonoBehaviour
 {
-  public FPS_Player_Movement fPS_Player_Movement;
-  public Animator playerAnimator;
+  [SerializeField]FPS_Player_Movement fPS_Player_Movement;
+  [SerializeField]Animator playerAnimator;
+
+  private void Start() 
+  {
+    playerAnimator = GetComponent<Animator>();
+    fPS_Player_Movement = GameObject.FindGameObjectWithTag("Player").GetComponent<FPS_Player_Movement>(); 
+  }
     
   void Update()
   {
