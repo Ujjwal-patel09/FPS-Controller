@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Player_Animation : MonoBehaviour
@@ -5,6 +6,10 @@ public class Player_Animation : MonoBehaviour
   [SerializeField]FPS_Player_Movement fPS_Player_Movement;
   [SerializeField]Animator playerAnimator;
 
+  // Player input from movement script
+  private float Forward_Backward_Input;
+  private float Right_Left_Input;
+  
   private void Start() 
   {
     playerAnimator = GetComponent<Animator>();
@@ -14,69 +19,85 @@ public class Player_Animation : MonoBehaviour
   void Update()
   {
     transform.localPosition = new Vector3(0,0,0);
-
-    // setting All the float value in blend tree 1 = Walking , 2 = Running //
-    walking_Running_Animation();
+     
+    Player_Input();
+    Walking_Animation();
+    Running_Animation();
     Jump_Animation();
     Crouch_Walking_Animation();
   
   }
+  
+  private void Player_Input()
+  {
+    Forward_Backward_Input = fPS_Player_Movement.InputZ;
+    Right_Left_Input = fPS_Player_Movement.InputX;
+  }
+  
+  private void Idle_Animation(string yDirection_float_Name,string xDirection_float_Name)
+  {
+    float Idle = 0f;
+    float transation_Time = 0.1f;
+    playerAnimator.SetFloat(yDirection_float_Name,Idle,transation_Time,Time.deltaTime);
+    playerAnimator.SetFloat(xDirection_float_Name,Idle,transation_Time,Time.deltaTime);
+  }
+  
+  private void Play_Animation (string yDirection_float_Name , string xDirection_float_Name)
+  {
+    float transation_Time = 0.1f;
+    float posative_Float = 1f;
+    float Nagetive_Float =-1f;
 
-  private void walking_Running_Animation()
+    if(Forward_Backward_Input > 0.1f)
+    {
+      playerAnimator.SetFloat(yDirection_float_Name,posative_Float,transation_Time,Time.deltaTime);// front
+    }
+    else if(Forward_Backward_Input < -0.1f)
+    {
+      playerAnimator.SetFloat(yDirection_float_Name,Nagetive_Float ,transation_Time,Time.deltaTime);// back
+    }
+    else
+    {
+      playerAnimator.SetFloat(yDirection_float_Name,0,transation_Time,Time.deltaTime);// no_Animation
+    }
+
+    if(Right_Left_Input > 0.1f)
+    {
+      playerAnimator.SetFloat( xDirection_float_Name,posative_Float,transation_Time,Time.deltaTime);// left
+    }
+    else if(Right_Left_Input < -0.1f)
+    {
+      playerAnimator.SetFloat( xDirection_float_Name, Nagetive_Float ,transation_Time,Time.deltaTime);// Right
+    }
+    else
+    {
+      playerAnimator.SetFloat( xDirection_float_Name,0,transation_Time,Time.deltaTime);// no_Animation
+    }  
+  }
+ 
+  private void Walking_Animation()
   {
     if(fPS_Player_Movement.iswalking == true)
     {
-      if(Input.GetKey(KeyCode.W))// for walking & running Front //
-      {
-        if(fPS_Player_Movement.isrunning == true)
-        {
-          playerAnimator.SetFloat("yWalk_Direction",2f,0.1f,Time.deltaTime);
-        }else
-        {
-          playerAnimator.SetFloat("yWalk_Direction",1f,0.1f,Time.deltaTime);
-        }
-      }
-
-      if(Input.GetKey(KeyCode.S))// for walking & running Backward //
-      {
-        if(fPS_Player_Movement.isrunning == true)
-        {
-          playerAnimator.SetFloat("yWalk_Direction",-2f,0.1f,Time.deltaTime);
-        }else
-        {
-          playerAnimator.SetFloat("yWalk_Direction",-1f,0.1f,Time.deltaTime);
-        }
-      }
-
-      if(Input.GetKey(KeyCode.A))// for walking & running Left //
-      {
-        if(fPS_Player_Movement.isrunning == true)
-        {
-          playerAnimator.SetFloat("xWalk_Direction",2f,0.1f,Time.deltaTime);
-        }else
-        {
-          playerAnimator.SetFloat("xWalk_Direction",1f,0.1f,Time.deltaTime);
-        }
-      }
-
-      if(Input.GetKey(KeyCode.D))// for walking & running Right //
-      {
-        if(fPS_Player_Movement.isrunning == true)
-        {
-          playerAnimator.SetFloat("xWalk_Direction",-2f,0.1f,Time.deltaTime);
-        }else
-        {
-          playerAnimator.SetFloat("xWalk_Direction",-1f,0.1f,Time.deltaTime);
-        }
-      }
+      Play_Animation("yWalk_Direction","xWalk_Direction");
     }else
     {
-      // stay Idle //
-      playerAnimator.SetFloat("yWalk_Direction",0,0.1f,Time.deltaTime);
-      playerAnimator.SetFloat("xWalk_Direction",0,0.1f,Time.deltaTime);
+      Idle_Animation("yWalk_Direction","xWalk_Direction");
     }
   }
 
+  private void Running_Animation()
+  {
+    if(fPS_Player_Movement.isrunning == true)
+    {
+      playerAnimator.SetBool("isRunning",true);
+      Play_Animation("yRun_Direction","xRun_Direction");
+    }else
+    {
+      playerAnimator.SetBool("isRunning",false);
+    }
+  }
+  
   private void Jump_Animation()
   {
     if(fPS_Player_Movement.isJumping == true)
@@ -93,27 +114,7 @@ public class Player_Animation : MonoBehaviour
     if(fPS_Player_Movement.isCrouching)
     {
       playerAnimator.SetBool("isCrouching",true);
-      if(Input.GetKey(KeyCode.W))
-      {
-        playerAnimator.SetFloat("yCrouch_Direction",1,0.1f,Time.deltaTime);
-      }
-      else if(Input.GetKey(KeyCode.S))
-      {
-        playerAnimator.SetFloat("yCrouch_Direction",-1,0.1f,Time.deltaTime);
-      }
-      else if(Input.GetKey(KeyCode.A))
-      {
-        playerAnimator.SetFloat("xCrouch_Direction",1,0.1f,Time.deltaTime);
-      }
-      else if(Input.GetKey(KeyCode.D))
-      {
-        playerAnimator.SetFloat("xCrouch_Direction",-1,0.1f,Time.deltaTime);
-      }
-      else
-      {
-        playerAnimator.SetFloat("xCrouch_Direction",0,0.1f,Time.deltaTime);
-        playerAnimator.SetFloat("yCrouch_Direction",0,0.1f,Time.deltaTime);
-      }
+      Play_Animation("yCrouch_Direction","xCrouch_Direction");
     }
     else
     {

@@ -10,19 +10,19 @@ public class FPS_Player_Movement : MonoBehaviour
    private float MoveSpeed;
    
    // player Input //
-   private float InputX;
-   private float InputZ;
+   [HideInInspector]public  float InputX;
+   [HideInInspector]public  float InputZ;
    private bool Jump_input;
    private bool Crouch_input;
 
    [Header("Walking")]
    [SerializeField] private bool Can_Walk = true;
-   [SerializeField] private float walking_speed;
+   [SerializeField] private float walking_speed = 3f;
    [HideInInspector]public bool iswalking;
    
    [Header("Running")]
-   [SerializeField] bool Can_Run = true;
-   [SerializeField] float running_speed;
+   [SerializeField] private bool Can_Run = true;
+   [SerializeField] private float running_speed = 6f;
    [HideInInspector]public bool isrunning;
     
    [Header("Ground_Check")]
@@ -36,23 +36,22 @@ public class FPS_Player_Movement : MonoBehaviour
    [SerializeField] private  bool canJump = true;
    [SerializeField] private float JumpHight;
    [SerializeField] private float Jump_CoolDown_Time;
-   [HideInInspector] public bool isJumping;
+   [HideInInspector]public bool isJumping;
 
    [Header("Crouching")]
    [SerializeField] private bool CanCrouch = true;
-   [SerializeField] private float crouch_Speed;
+   [SerializeField] private float crouch_Speed = 1.5f;
    [SerializeField] private float Stand_hight;
    [SerializeField] private float Crouch_hight;
-   [SerializeField] private float Time_to_Crouch;
+   [SerializeField] private float Time_to_Crouch = 0.25f;
    [SerializeField] private Vector3 Standing_Center;
    [SerializeField] private Vector3 Crouching_Center;
    [SerializeField] private float CrouchRadius;
    [SerializeField] private float StandRadius;
-
    [SerializeField] private GameObject camera_holder;
    [SerializeField] private Vector3 Stand_Cam_Pos;
    [SerializeField] private Vector3 Crouch_cam_pos;
-   [HideInInspector] public bool isCrouching;
+   [HideInInspector]public bool isCrouching;
     
    
    void Start()
@@ -151,7 +150,18 @@ public class FPS_Player_Movement : MonoBehaviour
          if(Crouch_input && isGrounded)
          {
             isCrouching = !isCrouching;
-            if(isCrouching){MoveSpeed = crouch_Speed;}
+            if(isCrouching)
+            {
+               MoveSpeed = crouch_Speed;
+               Can_Walk = false;
+               Can_Run = false;
+               canJump = false;
+            }else
+            {
+               Can_Walk = true;
+               Can_Run = true;
+               canJump = true;
+            }
             StartCoroutine(Crouch_Stand());
          }
       }
@@ -162,12 +172,16 @@ public class FPS_Player_Movement : MonoBehaviour
       float timeTaken = 0;
       float TargetHight = isCrouching? Crouch_hight : Stand_hight;
       float CurrentHight = characterController.height;
+
       Vector3 TargetCenter = isCrouching? Crouching_Center : Standing_Center;
       Vector3 CurrentCenter = characterController.center;
+
       float TargetRadius = isCrouching? CrouchRadius : StandRadius;
       float CurrentRadius = characterController.radius;
+
       Vector3 Target_Cam_Pos = isCrouching? Crouch_cam_pos : Stand_Cam_Pos;
       Vector3 Current_Cam_Pos = camera_holder.transform.localPosition;
+
       while(timeTaken < Time_to_Crouch)
       {
          characterController.height = Mathf.Lerp(CurrentHight,TargetHight,timeTaken/Time_to_Crouch);
@@ -182,7 +196,6 @@ public class FPS_Player_Movement : MonoBehaviour
       characterController.center = TargetCenter;
       characterController.radius = TargetRadius;
       camera_holder.transform.localPosition = Target_Cam_Pos;
-
    }
 
 }
